@@ -1,7 +1,7 @@
 "use client"
 
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api"
-import { useState, useCallback } from "react"
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api"
+import { useState, useCallback, useEffect } from "react"
 
 export default function Home() {
   const { isLoaded } = useJsApiLoader({
@@ -19,6 +19,22 @@ export default function Home() {
     mapSetter(null)
   }, [])
 
+  const [potholeCoords, potholeCoordsSetter] =
+    useState<google.maps.LatLngLiteral | null>()
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        potholeCoordsSetter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+      },
+      null,
+      { enableHighAccuracy: true }
+    )
+  }, [])
+
   return (
     <main className="min-h-screen">
       <div className="w-full lg:grid lg:grid-cols-2 lg:gap-4 flex flex-col gap-0 items-stretch">
@@ -31,14 +47,19 @@ export default function Home() {
           </h1>
         </div>
         <div className="p-4">
-          {isLoaded && (
+          {isLoaded && potholeCoords && (
             <GoogleMap
-              center={{ lat: 40.676786247456214, lng: -73.96008350857923 }}
+              center={potholeCoords}
               zoom={17}
               mapContainerClassName="map-container"
               onLoad={onMapLoad}
               onUnmount={onMapUnmount}
-            />
+            >
+              <Marker position={potholeCoords} />
+            </GoogleMap>
+          )}
+          {potholeCoords && (
+            <p className="text-xl">{`${potholeCoords.lat} ${potholeCoords.lng}`}</p>
           )}
         </div>
       </div>
