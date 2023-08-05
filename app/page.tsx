@@ -22,10 +22,17 @@ export default function Home() {
   const [potholeCoords, potholeCoordsSetter] =
     useState<google.maps.LatLngLiteral | null>()
 
+  const [initialMapCenter, initialMapCenterSetter] =
+    useState<google.maps.LatLngLiteral | null>()
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         potholeCoordsSetter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        initialMapCenterSetter({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         })
@@ -34,6 +41,12 @@ export default function Home() {
       { enableHighAccuracy: true }
     )
   }, [])
+
+  const onMapClick = (mouseEvent: google.maps.MapMouseEvent) => {
+    if (mouseEvent.latLng) {
+      potholeCoordsSetter(mouseEvent.latLng.toJSON())
+    }
+  }
 
   return (
     <main className="min-h-screen">
@@ -47,13 +60,14 @@ export default function Home() {
           </h1>
         </div>
         <div className="p-4">
-          {isLoaded && potholeCoords && (
+          {isLoaded && initialMapCenter && potholeCoords && (
             <GoogleMap
-              center={potholeCoords}
+              center={initialMapCenter}
               zoom={17}
               mapContainerClassName="map-container"
               onLoad={onMapLoad}
               onUnmount={onMapUnmount}
+              onClick={onMapClick}
             >
               <Marker position={potholeCoords} />
             </GoogleMap>
