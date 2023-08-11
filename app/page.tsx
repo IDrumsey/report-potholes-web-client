@@ -3,6 +3,7 @@
 import styles from "./_home.module.scss"
 
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api"
+import axios from "axios"
 import { useState, useCallback, useEffect } from "react"
 
 export default function Home() {
@@ -50,6 +51,14 @@ export default function Home() {
     }
   }
 
+  async function onReportBtnClick(coords: google.maps.LatLngLiteral) {
+    const response = await axios.post("/api/potholes", coords)
+
+    if (response.status == 200) {
+      alert("Pothole reported. Thanks!")
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white px-16 py-10">
       <div className="w-full lg:grid lg:grid-cols-2 lg:gap-4 flex flex-col gap-0 items-stretch">
@@ -80,6 +89,7 @@ export default function Home() {
               <div
                 id={styles["report-button"]}
                 className="ml-auto py-5 px-16 bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] hover:shadow-[0_4px_4px_0_rgba(0,0,0,0.5)] transition-shadow border-solid border-[#F1F1F1] border-1 rounded-md cursor-pointer"
+                onClick={() => onReportBtnClick(potholeCoords)}
               >
                 <p className="text-[#00A3FF] font-bold text-2xl">Report</p>
               </div>
