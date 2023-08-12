@@ -1,4 +1,20 @@
 #report-button {
   border: 1px solid #d8d8d8;
-  width: max-content;
+}
+
+
+#title-part-1 {
+  font-size: clamp(15px, 5vw + 1rem, 80px);
+}
+
+
+#title-part-2 {
+  font-size: clamp(15px, 5vw + 1rem, 80px);
+}
+
+
+@media screen and (min-width: 768px) {
+  #title-part-2 {
+    font-size: clamp(15px, 7vw + 1rem, 100px);
+  }
 }

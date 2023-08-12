@@ -60,17 +60,23 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-16 py-10">
-      <div className="w-full lg:grid lg:grid-cols-2 lg:gap-4 flex flex-col gap-0 items-stretch">
-        <div>
-          <h1 className="text-left text-7xl font-bold text-[#00A3FF]">
+    <main className="min-h-screen bg-white md:px-16 md:py-10 p-7">
+      <div className="w-full md:grid md:grid-cols-2 md:gap-4 flex flex-col gap-0 items-stretch">
+        <div className="inline-block m-auto mb-5 md:block md:m-0">
+          <h1
+            id={styles["title-part-1"]}
+            className="text-left font-bold text-[#00A3FF] inline-block md:block"
+          >
             Report a
           </h1>
-          <h1 className="pl-8 text-8xl mt-6 font-bold text-[#252525]">
+          <h1
+            id={styles["title-part-2"]}
+            className="pl-2 md:pl-8 md:mt-2 font-bold text-[#252525] inline-block md:block"
+          >
             Pothole
           </h1>
         </div>
-        <div className="p-4">
+        <div>
           {isLoaded && initialMapCenter && potholeCoords && (
             <>
               <GoogleMap
@@ -88,10 +94,12 @@ export default function Home() {
               )}
               <div
                 id={styles["report-button"]}
-                className="ml-auto py-5 px-16 bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] hover:shadow-[0_4px_4px_0_rgba(0,0,0,0.5)] transition-shadow border-solid border-[#F1F1F1] border-1 rounded-md cursor-pointer"
+                className="w-full max-w-md ml-auto py-5 px-16 bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] hover:shadow-[0_4px_4px_0_rgba(0,0,0,0.5)] transition-shadow border-solid border-[#F1F1F1] border-1 rounded-md cursor-pointer"
                 onClick={() => onReportBtnClick(potholeCoords)}
               >
-                <p className="text-[#00A3FF] font-bold text-2xl">Report</p>
+                <p className="text-[#00A3FF] text-center font-bold text-2xl">
+                  Report
+                </p>
               </div>
             </>
           )}
