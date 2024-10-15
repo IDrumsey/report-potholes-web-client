@@ -127,6 +127,7 @@ export default function Home() {
                 {reportedPotholes.map(
                   (reportedPothole, reportedPotholeIndex) => (
                     <Marker
+                      key={reportedPotholeIndex}
                       position={{
                         lat: reportedPothole.location_lat,
                         lng: reportedPothole.location_lng,
