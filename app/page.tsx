@@ -6,6 +6,8 @@ import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api"
 import axios from "axios"
 import { useState, useCallback, useEffect } from "react"
 
+const blueMarker = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+
 export default function Home() {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -56,8 +58,31 @@ export default function Home() {
 
     if (response.status == 200) {
       alert("Pothole reported. Thanks!")
+
+      // update the list to show the new reported pothole as red marker
+      updateReportedPotholesList()
+
+      // remove the blue marker
+      potholeCoordsSetter(null)
     }
   }
+
+  const [reportedPotholes, reportedPotholesSetter] = useState<Array<any>>([])
+
+  const updateReportedPotholesList = useCallback(async () => {
+    const response = await axios.get("/api/potholes?page=1")
+
+    if (response.status == 200) {
+      reportedPotholesSetter(response.data)
+    }
+  }, [])
+
+  useEffect(() => {
+    const initialLoadReportedPotholesDataHandler = async () => {
+      updateReportedPotholesList()
+    }
+    initialLoadReportedPotholesDataHandler()
+  }, [updateReportedPotholesList])
 
   return (
     <main className="min-h-screen bg-white md:px-16 md:py-10 p-7">
@@ -75,9 +100,15 @@ export default function Home() {
           >
             Pothole
           </h1>
+
+          {potholeCoords == null && (
+            <p className="text-[#252525]">
+              Click on the map to report a pothole
+            </p>
+          )}
         </div>
         <div>
-          {isLoaded && initialMapCenter && potholeCoords && (
+          {isLoaded && initialMapCenter && (
             <>
               <GoogleMap
                 center={initialMapCenter}
@@ -87,20 +118,38 @@ export default function Home() {
                 onUnmount={onMapUnmount}
                 onClick={onMapClick}
               >
-                <Marker position={potholeCoords} />
+                {potholeCoords && (
+                  <Marker
+                    position={potholeCoords}
+                    icon={blueMarker}
+                  />
+                )}
+                {reportedPotholes.map(
+                  (reportedPothole, reportedPotholeIndex) => (
+                    <Marker
+                      position={{
+                        lat: reportedPothole.location_lat,
+                        lng: reportedPothole.location_lng,
+                      }}
+                    />
+                  )
+                )}
               </GoogleMap>
               {potholeCoords && (
-                <p className="text-right text-sm my-5 text-black">{`${potholeCoords.lat} ${potholeCoords.lng}`}</p>
+                <>
+                  <p className="text-right text-sm my-5 text-black">{`${potholeCoords.lat} ${potholeCoords.lng}`}</p>
+
+                  <div
+                    id={styles["report-button"]}
+                    className="w-full max-w-md ml-auto py-5 px-16 bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] hover:shadow-[0_4px_4px_0_rgba(0,0,0,0.5)] transition-shadow border-solid border-[#F1F1F1] border-1 rounded-md cursor-pointer"
+                    onClick={() => onReportBtnClick(potholeCoords)}
+                  >
+                    <p className="text-[#00A3FF] text-center font-bold text-2xl">
+                      Report
+                    </p>
+                  </div>
+                </>
               )}
-              <div
-                id={styles["report-button"]}
-                className="w-full max-w-md ml-auto py-5 px-16 bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] hover:shadow-[0_4px_4px_0_rgba(0,0,0,0.5)] transition-shadow border-solid border-[#F1F1F1] border-1 rounded-md cursor-pointer"
-                onClick={() => onReportBtnClick(potholeCoords)}
-              >
-                <p className="text-[#00A3FF] text-center font-bold text-2xl">
-                  Report
-                </p>
-              </div>
             </>
           )}
         </div>
